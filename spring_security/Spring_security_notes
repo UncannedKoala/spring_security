@@ -1,0 +1,58 @@
+• Encoding is physically transforming the input from one form to another rather than encrypting it.
+  It may or may not require a secret key, as it can just be a mathematical transformation.
+  Mathematical transformation can even be reversing a string or moving a few characters from one place to another using any pattern.
+  The encoded result can be reverted to original input given the decoding algorithm. Example .
+  
+  Input -> |Encoding algorithm| -> Output
+  Output -> |Decoding algorithm| -> Input
+
+• Encrypting is the process of transforming input in such a way that to decode it you must have a secret key without which 
+  decoding becomes impossible. It can also be said that, ‘encryption is encoding that always uses a secret key.’
+  Encrypted data can only be decrypted given the decryption algorithm and the secret key. Example: Caesar Cypher.
+  
+  Input -> |encryption && secretKey| -> Output
+  Output -> |decryption && secretKey| -> Input
+
+• Hashing is transforming input in such a way that you cannot get the input back from the hashed value and two inputs with 
+  same value will return same hashes. Its rules are same as they are in .hashCode() in java, 2 different objects may return 
+  the same hash but 2 equal objects must return the same hash.
+  Hashing the passwords makes sure that the password cannot be achieved from the hash.
+  Hashes can be used to verify the data integrity.
+  
+  Input -> hashing -> hash
+  Hash !-> input
+
+MD5 has been found to suffer from extensive vulnerabilities, especially the risk of collision attacks. A collision attack is where two different inputs produce the same hash value, which can compromise the security and authenticity of the data2. MD5 is considered insecure for cryptographic purposes and has been deprecated in favour of more secure hash functions, such as SHA-256 and SHA-3, due to the discovery of practical collision vulnerabilities
+
+• not to use MD5 encryption, as it depricated as it could be un-hashed to get the original input
+
+
+• UserDetailService is a Core interface which loads user-specific data.
+  The interface requires only one read-only method, which simplifies support for new data-access strategies.
+  It is used throughout the framework as a user DAO and is the strategy used by the DaoAuthenticationProvider to retrieve 
+  a username, a password, and other attributes for authenticating with a username and password.
+  Spring Security provides in-memory(InMemoryUserDetailsManager) and JDBC implementations of UserDetailsService.
+
+  You can define custom authentication by exposing a custom UserDetailsService as a bean. 
+
+• Spring Security’s PasswordEncoder interface is used to perform a one-way transformation of a password to let the password be stored securely. 
+  Given PasswordEncoder is a one-way transformation, it is not useful when the password transformation needs to be two-way 
+  (such as storing credentials used to authenticate to a database). 
+  Typically, PasswordEncoder is used for storing a password that needs to be compared to a user-provided password at the time of authentication.
+  
+  Spring Security’s servlet support includes storing passwords securely by integrating with PasswordEncoder. 
+  You can customize the PasswordEncoder implementation used by Spring Security by exposing a PasswordEncoder Bean.
+  You may get this if there is no password encoder at all ->PasswordEncoder: There is no PasswordEncoder mapped for the id "null"<-
+  If you do not want the password to be encoded(not-recommended), you may use the NoOpPasswordEncoder.getInstance(); here, NoOpPasswordEncoder is a password encoder that does nothing.
+  Useful for testing where working with plain text passwords may be preferred..
+
+• 'InMemoryUserDetailsManager' is a Non-persistent implementation of UserDetailsManager which is backed by anin-memory map.
+  Mainly intended for testing and demonstration purposes, where a full blown persistentsystem isn't required.
+
+
+Spring security--->      Sprign MVC -->| Spring web -->
+filter1 <> filter2 <> .... <> Servlet <> Controller <> Service <> ...Business application...
+
+
+• 
+  •
