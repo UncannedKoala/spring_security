@@ -1,19 +1,19 @@
 • Encoding is physically transforming the input from one form to another rather than encrypting it.
   It may or may not require a secret key, as it can just be a mathematical transformation.
   Mathematical transformation can even be reversing a string or moving a few characters from one place to another using any pattern.
-  The encoded result can be reverted to original input given the decoding algorithm. Example .
+  The encoded result can be reverted to original input given the decoding algorithm. Example BCryptPasswordEncoder.
   
   Input -> |Encoding algorithm| -> Output
   Output -> |Decoding algorithm| -> Input
 
-• Encrypting is the process of transforming input in such a way that to decode it you must have a secret key without which 
+• Encrypting is the process of transforming input in such a way that to decode it we must have a secret key without which 
   decoding becomes impossible. It can also be said that, ‘encryption is encoding that always uses a secret key.’
   Encrypted data can only be decrypted given the decryption algorithm and the secret key. Example: Caesar Cypher.
   
   Input -> |encryption && secretKey| -> Output
   Output -> |decryption && secretKey| -> Input
 
-• Hashing is transforming input in such a way that you cannot get the input back from the hashed value and two inputs with 
+• Hashing is transforming input in such a way that we cannot get the input back from the hashed value and two inputs with 
   same value will return same hashes. Its rules are same as they are in .hashCode() in java, 2 different objects may return 
   the same hash but 2 equal objects must return the same hash.
   Hashing the passwords makes sure that the password cannot be achieved from the hash.
@@ -27,13 +27,14 @@ MD5 has been found to suffer from extensive vulnerabilities, especially the risk
 • not to use MD5 encryption, as it depricated as it could be un-hashed to get the original input
 
 
-• UserDetailService is a Core interface which loads user-specific data.
+• UserDetailService is a Core interface which loads user-specific data, It is a functional interface having
+  'loadUserByUsername(String username) throws UsernameNotFoundException' as functional method.
   The interface requires only one read-only method, which simplifies support for new data-access strategies.
-  It is used throughout the framework as a user DAO and is the strategy used by the DaoAuthenticationProvider to retrieve 
+  It is used throughout the framework as a user DAO and is the strategy used by the DaoAuthenticationProvider to retrieve
   a username, a password, and other attributes for authenticating with a username and password.
   Spring Security provides in-memory(InMemoryUserDetailsManager) and JDBC implementations of UserDetailsService.
 
-  You can define custom authentication by exposing a custom UserDetailsService as a bean. 
+  we can define custom authentication by exposing a custom UserDetailsService as a bean. 
 
 • Spring Security’s PasswordEncoder interface is used to perform a one-way transformation of a password to let the password be stored securely. 
   Given PasswordEncoder is a one-way transformation, it is not useful when the password transformation needs to be two-way 
@@ -41,18 +42,28 @@ MD5 has been found to suffer from extensive vulnerabilities, especially the risk
   Typically, PasswordEncoder is used for storing a password that needs to be compared to a user-provided password at the time of authentication.
   
   Spring Security’s servlet support includes storing passwords securely by integrating with PasswordEncoder. 
-  You can customize the PasswordEncoder implementation used by Spring Security by exposing a PasswordEncoder Bean.
-  You may get this if there is no password encoder at all ->PasswordEncoder: There is no PasswordEncoder mapped for the id "null"<-
-  If you do not want the password to be encoded(not-recommended), you may use the NoOpPasswordEncoder.getInstance(); here, NoOpPasswordEncoder is a password encoder that does nothing.
+  We can customize the PasswordEncoder implementation used by Spring Security by exposing a PasswordEncoder Bean.
+  We may get this if there is no password encoder at all ->PasswordEncoder: There is no PasswordEncoder mapped for the id "null"<-
+  If we do not want the password to be encoded(not-recommended), we may use the NoOpPasswordEncoder.getInstance(); here, NoOpPasswordEncoder is a password encoder that does nothing.
   Useful for testing where working with plain text passwords may be preferred..
 
 • 'InMemoryUserDetailsManager' is a Non-persistent implementation of UserDetailsManager which is backed by anin-memory map.
   Mainly intended for testing and demonstration purposes, where a full blown persistentsystem isn't required.
 
-
 Spring security--->      Sprign MVC -->| Spring web -->
 filter1 <> filter2 <> .... <> Servlet <> Controller <> Service <> ...Business application...
 
+• 'com.spring_security.services.JpaUserDetailService.loadUserByUsername(String username) is supposed to be returning a UserDetails(i) child-object but the '
+  'com.spring_security.services.UserRepository.findUserByUserName(String userName)' returns an optional. This problem can be solved in 3 ways:
+  1). Make the User class implement UserDetails interface -> !!!It voilates the SRP, and pollutes the Entity class
+  2). Mapper, create a diffrent class(UserDetails implementation) and use a mapper to create a copy of the User object.
+ *3). Decorator Pattern, use a decorator class that deligates the 'getpassword()' and 'getUserName()' 
+
+• At any point in the application we can use 'SecurityContextHolder' that associates a given SecurityContext with the current execution thread, to get the 'SecureityContext' using .getContext() and then call .getAuthentication() to get the Authentication. Using .getAuthorities() on this authentication we can know what are the authorities does this user have.
+  •
+
+• 
+  •
 
 • 
   •
