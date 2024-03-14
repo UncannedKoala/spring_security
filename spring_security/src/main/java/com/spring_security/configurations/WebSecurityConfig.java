@@ -2,20 +2,28 @@ package com.spring_security.configurations;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.crypto.password.NoOpPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+
+import com.spring_security.configurations.security.filters.CustomAuthenticationFilter;
+
+import lombok.AllArgsConstructor;
 
 @Configuration
+@AllArgsConstructor
 public class WebSecurityConfig {
 
-	/**
-	 * Although NoPasswordEncoder is depricated and not used in real world
-	 * applications we use it here as often found in the examples
-	 * 
-	 */
-	@Bean
-	public PasswordEncoder passwordEncoder() {
-		return NoOpPasswordEncoder.getInstance();
+	private final CustomAuthenticationFilter customAuthFilter;
 
+//	authorizehttprequestconfigurer
+	@Bean
+	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+		return http.addFilterAt(customAuthFilter, UsernamePasswordAuthenticationFilter.class)
+				.authorizeRequests()
+				.anyRequest()
+				.authenticated()
+				.and()
+				.build();
 	}
 }

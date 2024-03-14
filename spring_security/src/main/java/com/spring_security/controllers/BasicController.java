@@ -10,7 +10,6 @@ public class BasicController {
 	@GetMapping("/greet")
 	public String greet() {
 		var u = SecurityContextHolder.getContext().getAuthentication();
-		u.getAuthorities().forEach(System.out::println);
 		return "Hello";
 	}
 }

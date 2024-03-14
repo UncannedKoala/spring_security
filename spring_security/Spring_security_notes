@@ -26,7 +26,6 @@ MD5 has been found to suffer from extensive vulnerabilities, especially the risk
 
 • not to use MD5 encryption, as it depricated as it could be un-hashed to get the original input
 
-
 • UserDetailService is a Core interface which loads user-specific data, It is a functional interface having
   'loadUserByUsername(String username) throws UsernameNotFoundException' as functional method.
   The interface requires only one read-only method, which simplifies support for new data-access strategies.
@@ -50,20 +49,65 @@ MD5 has been found to suffer from extensive vulnerabilities, especially the risk
 • 'InMemoryUserDetailsManager' is a Non-persistent implementation of UserDetailsManager which is backed by anin-memory map.
   Mainly intended for testing and demonstration purposes, where a full blown persistentsystem isn't required.
 
-Spring security--->      Sprign MVC -->| Spring web -->
-filter1 <> filter2 <> .... <> Servlet <> Controller <> Service <> ...Business application...
+  Spring security--->      Sprign MVC -->| Spring web -->
+  filter1 <> filter2 <> .... <> Servlet <> Controller <> Service <> ...Business application...
 
 • 'com.spring_security.services.JpaUserDetailService.loadUserByUsername(String username) is supposed to be returning a UserDetails(i) child-object but the '
   'com.spring_security.services.UserRepository.findUserByUserName(String userName)' returns an optional. This problem can be solved in 3 ways:
-  1). Make the User class implement UserDetails interface -> !!!It voilates the SRP, and pollutes the Entity class
-  2). Mapper, create a diffrent class(UserDetails implementation) and use a mapper to create a copy of the User object.
- *3). Decorator Pattern, use a decorator class that deligates the 'getpassword()' and 'getUserName()' 
+  1). Make the User class implement UserDetails interface -> !!!It violates the SRP, and pollutes the Entity class
+  2). Mapper, create a different class(UserDetails implementation) and use a mapper to create a copy of the User object.
+ *3). Decorator Pattern, use a decorator class that delegates the 'getpassword()' and 'getUserName()' 
 
-• At any point in the application we can use 'SecurityContextHolder' that associates a given SecurityContext with the current execution thread, to get the 'SecureityContext' using .getContext() and then call .getAuthentication() to get the Authentication. Using .getAuthorities() on this authentication we can know what are the authorities does this user have.
-  •
+• At any point in the application we can use 'SecurityContextHolder' that associates a given SecurityContext with the current execution thread, to get the 'SecureityContext'
+  using .getContext() and then call .getAuthentication() to get the Authentication. Using .getAuthorities() on this authentication we can know what are the authorities does this user have.
 
-• 
-  •
+• Now by default convention, the controller is secured using 'http basic' authentication, where ID and password are Base64 encoding, and gives us a credential printed on the console to use
+  for the requests.
+
+• A filter is an object that performs filtering tasks on either the request to a resource (a servlet or static content), or on the response from a resource, or both.
+
+• Conventionally, 'UsernamePasswordAuthenticationFilter.class' is used as filtering the requests.
+
+• Records are final thus aspects on Records will not work.
+
+• To use a custom filter 
+  1). • We create a CustomAuthentication class that implements 'org.springframework.security.core.Authentication' interface.
+      • Overrider all inherited abstract methods.
+      • Create a final boolean instance variable 'authenticated', another final instance variable that holds the input key from the user, an all-args constructor, setters, and getters.
+      • Return 'authenticated' from overridden isAuthenticated().
+  2). • Create a CustomAuthenticationProvider class that implements 'org.springframework.security.core.AuthenticationProvider' interface.
+      • Override the inherited abstract methods.
+      • Mark the class with @Component so that spring creates a bean.
+      • In this class we create a 'secretKey' as private final string instance variable, get it's from the properties file (or some secret vault where it is stored). 
+      • In supports(), compare CustomAuthentication '.class' object to method parameter and return the result. This method is used by spring to figure if this AuthenticationProvider
+        supports cretain Authentication.
+      • While in authenticate(), type cast the parameter to CustomAuthentication and compare 'secretKey' instance variable value to the 
+        authentications secret key (using CustomAuthentication.getSecretKey() getter). If equlaity check succeeds, return a new CustomAuthentication
+        object with 'authenticated' value as true and 'secretKey' as null (coz, we would not want to expose the secret key). Else, if the secretkey differs from the user authentication key
+        throw a suitable exception (BadCredentialException.class).
+  3). • Create a CustomAuthenticationManager class that implements the ‘com.springframework.security.authentication.AuthenticationManager’ interface.
+      • Override the inherited abstract method authenticate().
+      • Create a private final instance variable of type CustomAuthenticationProvider and create an all-args constructor to initialise it.
+      • Mark the class as @Component.
+      • In authenticate(), check if Authentication passed in the params is supported by the CustomAuthenticationProvider, if yes then call authenticate() on CustomAuthenticationManager 
+        reference passing the authentication and returning the result. Else throw an Exception.
+  4). • Create a CustomAuthenticationFilter class that extends the ‘org.springframework.web.filter.OncePerRequestFilter’ interface. We could have implemented 
+        'jakarta.servlet.Filter' but in that case then there would be no guarantee that the filter is called only once.
+      • Further we override the 'doFilterInternal(HttpServletRequest, HttpServletResponse, FilterChain)'
+      • Create a private final instance variable of type CustomAuthenticationManager and create an all-args constructor to initialise it.
+      • Mark the class as @Component.
+      • In doFilterInternal(), get the input secret key from request headers using .getHeader(“key”)
+      • Create an object of type CustomAuthentication, that represents an authentication which is not authorised yet, with its ‘secretKey’ set to key from the request header 
+        and ‘authenticated’ set to false.
+      • Call the authenticate() on the AuthenticationManager instance variable and pass the authentication created above. Get the hold of returned Authentication instance.
+      • If the authentication is successful (returned Authentication has ‘authenticated’ as true), then get hold of the security context and set this authentication for context. 
+        And call the doFilter() of the filter from params passing request and response, this sends the request to next filter in the filter chain. 
+
+
+• HttpSecurity acts as the central configuration point for defining various security aspects, ensuring the application's
+  data and functionalities are protected from unauthorized access and malicious activities. Thus, we ask spring to inject 'HttpSecurity' into the SecurityFilterChain creating @Bean method
+  and add the filter to it.
+
 
 • 
   •
