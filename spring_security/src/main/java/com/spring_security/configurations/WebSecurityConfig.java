@@ -2,37 +2,28 @@ package com.spring_security.configurations;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.crypto.password.NoOpPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.provisioning.InMemoryUserDetailsManager;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+
+import com.spring_security.configurations.security.filters.CustomAuthenticationFilter;
+
+import lombok.AllArgsConstructor;
 
 @Configuration
+@AllArgsConstructor
 public class WebSecurityConfig {
 
+	private final CustomAuthenticationFilter customAuthFilter;
+
+//	authorizehttprequestconfigurer
 	@Bean
-	public UserDetailsService userDetailService() {
-		InMemoryUserDetailsManager udServiceManager = new InMemoryUserDetailsManager();
-		
-		//creating a user, with details
-		UserDetails user = User.withUsername("userName").password("password").authorities("read").build();
-
-		// Placing the created user into the UserDetailService 
-		udServiceManager.createUser(user);
-
-		return udServiceManager;
-	}
-
-	/**
-	 * Although NoPasswordEncoder is depricated and not used in real world
-	 * applications we use it here as often found in the examples
-	 * 
-	 */
-	@Bean
-	public PasswordEncoder passwordEncoder() {
-		return NoOpPasswordEncoder.getInstance();
-
+	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+		return http.addFilterAt(customAuthFilter, UsernamePasswordAuthenticationFilter.class)
+				.authorizeRequests()
+				.anyRequest()
+				.authenticated()
+				.and()
+				.build();
 	}
 }
