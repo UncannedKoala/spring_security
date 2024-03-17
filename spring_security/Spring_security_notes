@@ -103,11 +103,20 @@ MD5 has been found to suffer from extensive vulnerabilities, especially the risk
       • If the authentication is successful (returned Authentication has ‘authenticated’ as true), then get hold of the security context and set this authentication for context. 
         And call the doFilter() of the filter from params passing request and response, this sends the request to next filter in the filter chain. 
 
-
 • HttpSecurity acts as the central configuration point for defining various security aspects, ensuring the application's
   data and functionalities are protected from unauthorized access and malicious activities. Thus, we ask spring to inject 'HttpSecurity' into the SecurityFilterChain creating @Bean method
   and add the filter to it.
 
+• 'jakarta.servlet.Filter' is an Interface, where as 'org.springframework.web.filter.OncePerRequestFilter' is a Class, also as you can see they belong to diffrent packages.
+  While Filter intrerface has the 'doFilter()' as SAM(Single abstract Method), The 'OncePerRequestFilter' class has 'doFilterInternal()' as SAM.
 
-• 
-  •
+• 'org.springframework.security.config.annotation.web.builders.HttpSecurity.httpBasic()' Configures HTTP Basic authentication.
+
+• To use Default authentication (Http Authentication) and Custom authentication at the same time, using a filter for each. We will,
+  1. Create a Custom Authentication.
+  2. Create a Custom AuthenticationProvider that provides the authentication functionality using this custom authentication.
+  3. Create a CustomAuthenticationManager that uses this authentication provider to authenticate the requests.
+  4. A Filter class that is an extension of the OncePerRequestFilter, and do the 4 step process in the doFilterInternal(). These steps are creating a CustomAuthentication 
+     instance representing the authentication that is not authenticated yet using the input api-key, create an CustomAuthenticationFilterManager instance, delegate the responsibility 
+     of authentication to CustomAuthenticationManager, if authenticated then set this authentication object in the SecurityContext and call the next filter in the filter chain.
+
