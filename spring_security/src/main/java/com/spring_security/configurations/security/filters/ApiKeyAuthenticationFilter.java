@@ -24,6 +24,7 @@ public class ApiKeyAuthenticationFilter extends OncePerRequestFilter {
 		String inputKey = request.getHeader("key");
 		if (inputKey == null) {
 			filterChain.doFilter(request, response);
+			return;
 		}
 
 		// authentication that is not yet authorized

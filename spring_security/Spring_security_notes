@@ -120,3 +120,12 @@ MD5 has been found to suffer from extensive vulnerabilities, especially the risk
      instance representing the authentication that is not authenticated yet using the input api-key, create an CustomAuthenticationFilterManager instance, delegate the responsibility 
      of authentication to CustomAuthenticationManager, if authenticated then set this authentication object in the SecurityContext and call the next filter in the filter chain.
 
+• Roles and Authorities technically represent the same thing. GrantedAuthority represents a authority(to do something) granted to the Authentication object.
+
+• Role represent the BADGE/POSITION and the role is equipped with various authorities, while authority in itself is the power to do something(a verb)
+  
+• While org.springframework.security.core.userdetails.User.UserBuilder.authorities(String... authorities) creates an object of SimpleGrantedAuthority(an implementation of
+  GrantedAuthority) generally authorities are like 'read' and 'write', 
+  springframework.security.core.userdetails.User.UserBuilder.roles(String... roles) also creates an object of SimpleGrantedAuthority(an implementation of GrantedAuthority) but 
+  prepends thearguments with "ROLE_"; Roles are like 'ADMIN', 'MANAGER', 'USER'.
+
